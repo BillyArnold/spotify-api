@@ -1,3 +1,5 @@
+"use client";
+
 import { redirectToAuthCodeFlow } from "./actions/spotify/redirectToAuthCodeFlow";
 import { getAccessToken } from "./actions/spotify/getAccessToken";
 import { fetchProfile } from "./actions/spotify/fetchProfile";
@@ -36,38 +38,40 @@ interface Image {
 }
 
 export default function Home({ searchParams }: HomeProps) {
-  //  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "";
-  const cookieStore = cookies();
-
   const code = searchParams.code;
 
   const setAccessToken = async () => {
-    if (!cookieStore.get("spotifyAccessToken")) {
+    if (!localStorage.getItem("spotifyAccessToken")) {
       const accessToken = await getAccessToken(clientId, code);
       if (accessToken) {
-        //spotifyAuth.updateToken(accessToken);
-        cookieStore.set("spotifyAccessToken", accessToken);
+        localStorage.setItem("spotifyAccessToken", accessToken);
       }
+    } else {
+      const profileRes = await fetchProfile(
+        localStorage.getItem("spotifyAccessToken"),
+      );
+      setProfile((profilePrev) =>
+        profilePrev?.display_name ? profilePrev : profileRes,
+      );
     }
 
     if (!code) {
       redirectToAuthCodeFlow(clientId);
-    } else {
-      //const profileRes = await fetchProfile(accessToken);
-      //setProfile((profilePrev) =>
-      //  profilePrev?.display_name ? profilePrev : profileRes,
-      //);
     }
   };
 
-  if (!cookieStore.get("spotifyAccessToken")) {
-    setAccessToken();
-  }
+  useEffect(() => {
+    if (!localStorage.getItem("spotifyAccessToken")) {
+      setAccessToken();
+    }
+  }, []);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {cookieStore.get("spotifyAccessToken")}
+      {JSON.stringify(profile)}
+      {localStorage.getItem("spotifyAccessToken")}
     </main>
   );
 }
