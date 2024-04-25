@@ -1,9 +1,9 @@
-"use client";
-
 import { redirectToAuthCodeFlow } from "./actions/spotify/redirectToAuthCodeFlow";
 import { getAccessToken } from "./actions/spotify/getAccessToken";
 import { fetchProfile } from "./actions/spotify/fetchProfile";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { useSpotifyStore } from "./store/spotify-auth";
+import { cookies } from "next/headers";
 
 type HomeProps = {
   searchParams: {
@@ -36,38 +36,38 @@ interface Image {
 }
 
 export default function Home({ searchParams }: HomeProps) {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  //  const [profile, setProfile] = useState<UserProfile | null>(null);
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "";
+  const cookieStore = cookies();
 
   const code = searchParams.code;
 
-  const checkAccess = async () => {
+  const setAccessToken = async () => {
+    if (!cookieStore.get("spotifyAccessToken")) {
+      const accessToken = await getAccessToken(clientId, code);
+      if (accessToken) {
+        //spotifyAuth.updateToken(accessToken);
+        cookieStore.set("spotifyAccessToken", accessToken);
+      }
+    }
+
     if (!code) {
-      console.log("no code");
       redirectToAuthCodeFlow(clientId);
     } else {
-      const accessToken = await getAccessToken(clientId, code);
-      const profileRes = await fetchProfile(accessToken);
-      console.log(profileRes, "res");
-      setProfile((profilePrev) =>
-        profilePrev?.display_name ? profilePrev : profileRes,
-      );
+      //const profileRes = await fetchProfile(accessToken);
+      //setProfile((profilePrev) =>
+      //  profilePrev?.display_name ? profilePrev : profileRes,
+      //);
     }
   };
 
-  useEffect(() => {
-    if (!profile) {
-      checkAccess();
-    }
-  }, []);
-
-  if (!profile) {
-    return <div>LOADING...</div>;
+  if (!cookieStore.get("spotifyAccessToken")) {
+    setAccessToken();
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {JSON.stringify(profile)}
+      {cookieStore.get("spotifyAccessToken")}
     </main>
   );
 }
