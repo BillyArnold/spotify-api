@@ -1,17 +1,7 @@
-"use client";
-
-import { redirectToAuthCodeFlow } from "./actions/spotify/redirectToAuthCodeFlow";
-import { getAccessToken } from "./actions/spotify/getAccessToken";
+import Link from "next/link";
 import { fetchProfile } from "./actions/spotify/fetchProfile";
-import { use, useEffect, useState } from "react";
-import { useSpotifyStore } from "./store/spotify-auth";
-import { cookies } from "next/headers";
 
-type HomeProps = {
-  searchParams: {
-    code: string;
-  };
-};
+type HomeProps = {};
 
 interface UserProfile {
   country: string;
@@ -37,41 +27,17 @@ interface Image {
   width: number;
 }
 
-export default function Home({ searchParams }: HomeProps) {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID || "";
-  const code = searchParams.code;
-
-  const setAccessToken = async () => {
-    if (!localStorage.getItem("spotifyAccessToken")) {
-      const accessToken = await getAccessToken(clientId, code);
-      if (accessToken) {
-        localStorage.setItem("spotifyAccessToken", accessToken);
-      }
-    } else {
-      const profileRes = await fetchProfile(
-        localStorage.getItem("spotifyAccessToken"),
-      );
-      setProfile((profilePrev) =>
-        profilePrev?.display_name ? profilePrev : profileRes,
-      );
-    }
-
-    if (!code) {
-      redirectToAuthCodeFlow(clientId);
-    }
-  };
-
-  useEffect(() => {
-    if (!localStorage.getItem("spotifyAccessToken")) {
-      setAccessToken();
-    }
-  }, []);
-
+export default async function Home({}: HomeProps) {
+  const profile: UserProfile = await fetchProfile();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Link
+        className="border-white border-2 rounded-3xl py-4 px-6"
+        href="/api/spotify-redirect"
+      >
+        Connect to spotify
+      </Link>
       {JSON.stringify(profile)}
-      {localStorage.getItem("spotifyAccessToken")}
     </main>
   );
 }
