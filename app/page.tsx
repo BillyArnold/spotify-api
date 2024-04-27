@@ -31,13 +31,16 @@ export default async function Home({}: HomeProps) {
   const profile: UserProfile = await fetchProfile();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Link
-        className="border-white border-2 rounded-3xl py-4 px-6"
-        href="/api/spotify-redirect"
-      >
-        Connect to spotify
-      </Link>
-      {JSON.stringify(profile)}
+      {!profile ? (
+        <Link
+          className="border-white border-2 rounded-3xl py-4 px-6"
+          href="/api/spotify-redirect"
+        >
+          Connect to spotify
+        </Link>
+      ) : (
+        <div>{JSON.stringify(profile)</div>
+      )}
     </main>
   );
 }
