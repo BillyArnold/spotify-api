@@ -12,13 +12,13 @@ export async function fetchProfile(): Promise<any> {
     const val = await result.json();
 
     if (val.error) {
+      console.error("Access token invalid");
       return null;
-      //throw new Error("Access token invalid");
     }
 
     return val; // TODO: Call Web API
   }
 
+  console.error("No access token found");
   return null;
-  //throw new Error("No access token found");
 }
