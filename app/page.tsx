@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { fetchProfile } from "./actions/spotify/fetchProfile";
+import Profile from "@/components/profile";
 
 type HomeProps = {};
 
-interface UserProfile {
+export interface UserProfile {
   country: string;
   display_name: string;
   email: string;
@@ -21,7 +22,7 @@ interface UserProfile {
   uri: string;
 }
 
-interface Image {
+export interface Image {
   url: string;
   height: number;
   width: number;
@@ -39,7 +40,7 @@ export default async function Home({}: HomeProps) {
           Connect to spotify
         </Link>
       ) : (
-        <div>{JSON.stringify(profile)</div>
+        <Profile profile={profile} />
       )}
     </main>
   );

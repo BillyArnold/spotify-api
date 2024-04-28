@@ -9,7 +9,14 @@ export async function fetchProfile(): Promise<any> {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    return await result.json(); // TODO: Call Web API
+    const val = await result.json();
+
+    if (val.error) {
+      return null;
+      //throw new Error("Access token invalid");
+    }
+
+    return val; // TODO: Call Web API
   }
 
   throw new Error("No access token found");
