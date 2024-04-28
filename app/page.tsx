@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { fetchProfile } from "./actions/spotify/fetchProfile";
 import Profile from "@/components/profile";
+import { fetchUserTopArtists } from "./actions/spotify/fetchUserTopArtists";
+import UserTopArtists from "@/components/userTopArtists";
 
 type HomeProps = {};
 
@@ -30,6 +32,7 @@ export interface Image {
 
 export default async function Home({}: HomeProps) {
   const profile: UserProfile = await fetchProfile();
+  const topArtists = await fetchUserTopArtists();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {!profile ? (
@@ -40,7 +43,10 @@ export default async function Home({}: HomeProps) {
           Connect to spotify
         </Link>
       ) : (
-        <Profile profile={profile} />
+        <>
+          <Profile profile={profile} />
+          <UserTopArtists topArtists={topArtists} />
+        </>
       )}
     </main>
   );

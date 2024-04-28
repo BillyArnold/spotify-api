@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a basic project to show how server components can be used to connect to the spotify api, to use you will need to update env spotify api keys and redirect urls
 
 ## Getting Started
 

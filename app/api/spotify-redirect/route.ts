@@ -24,7 +24,10 @@ export async function GET(request: NextRequest) {
     spotParams.append("client_id", clientId);
     spotParams.append("response_type", "code");
     spotParams.append("redirect_uri", redirectUri);
-    spotParams.append("scope", "user-read-private user-read-email");
+    spotParams.append(
+      "scope",
+      "user-read-private user-read-email user-top-read",
+    );
     spotParams.append("code_challenge_method", "S256");
     spotParams.append("code_challenge", challenge);
 
