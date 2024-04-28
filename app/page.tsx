@@ -3,8 +3,15 @@ import { fetchProfile } from "./actions/spotify/fetchProfile";
 import Profile from "@/components/profile";
 import { fetchUserTopArtists } from "./actions/spotify/fetchUserTopArtists";
 import UserTopArtists from "@/components/userTopArtists";
+import Search from "@/components/search";
+import { Suspense } from "react";
+import SearchResults from "@/components/searchResults";
 
-type HomeProps = {};
+type HomeProps = {
+  searchParams: {
+    query?: string;
+  };
+};
 
 export interface UserProfile {
   country: string;
@@ -30,9 +37,12 @@ export interface Image {
   width: number;
 }
 
-export default async function Home({}: HomeProps) {
+export default async function Home({ searchParams }: HomeProps) {
   const profile: UserProfile = await fetchProfile();
   const topArtists = await fetchUserTopArtists();
+
+  const query = searchParams?.query || "";
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {!profile ? (
@@ -45,6 +55,10 @@ export default async function Home({}: HomeProps) {
       ) : (
         <>
           <Profile profile={profile} />
+          <Search placeholder="Search for track" />
+          <Suspense key={query} fallback={<div>Loading...</div>}>
+            <SearchResults query={query} />
+          </Suspense>
           <UserTopArtists topArtists={topArtists} />
         </>
       )}
